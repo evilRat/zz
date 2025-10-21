@@ -1,0 +1,20 @@
+.trade-detail {
+  padding: 30rpx;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.label {
+  font-weight: bold;
+  color: #666;
+}
+
+.actions {
+  margin-top: 50rpx;
+  text-align: center;
+}

@@ -1,0 +1,36 @@
+<view class="container">
+  <!-- 顶部股票/基金选择器 -->
+  <scroll-view class="stock-selector" scroll-x="true">
+    <view class="stock-item {{currentStock === 'all' ? 'active' : ''}}" data-stock="all" bindtap="selectStock">全部</view>
+    <view wx:for="{{stocks}}" wx:key="id" class="stock-item {{currentStock === item.code ? 'active' : ''}}" data-stock="{{item.code}}" bindtap="selectStock">
+      {{item.name}}({{item.code}})
+    </view>
+  </scroll-view>
+
+  <!-- 交易记录列表 -->
+  <view class="trade-list">
+    <view class="trade-item trade-header">
+      <text>股票/基金</text>
+      <text>类型</text>
+      <text>价格</text>
+      <text>数量</text>
+      <text>金额</text>
+    </view>
+    <view wx:for="{{trades}}" wx:key="id" class="trade-item" data-id="{{item.id}}" bindtap="goToDetail">
+      <view>
+        <text>{{item.stockName}}</text>
+        <text class="trade-{{item.type}}">{{item.type === 'buy' ? '买入' : '卖出'}}</text>
+      </view>
+      <view>
+        <text>{{item.price}}</text>
+        <text>{{item.quantity}}</text>
+        <text class="trade-{{item.profit >= 0 ? 'positive' : 'negative'}}">{{item.amount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-button" bindtap="goToAddTrade">
+    <image src="/images/add.png" mode="aspectFit"></image>
+  </view>
+</view>

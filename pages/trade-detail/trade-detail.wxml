@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="trade-detail">
+    <view class="detail-item">
+      <text class="label">股票/基金:</text>
+      <text>{{trade.stockName}}({{trade.stockCode}})</text>
+    </view>
+    
+    <view class="detail-item">
+      <text class="label">交易类型:</text>
+      <text class="trade-{{trade.type}}">{{trade.type === 'buy' ? '买入' : '卖出'}}</text>
+    </view>
+    
+    <view class="detail-item">
+      <text class="label">交易价格:</text>
+      <text>¥{{trade.price}}</text>
+    </view>
+    
+    <view class="detail-item">
+      <text class="label">交易数量:</text>
+      <text>{{trade.quantity}}</text>
+    </view>
+    
+    <view class="detail-item">
+      <text class="label">交易金额:</text>
+      <text>¥{{trade.amount}}</text>
+    </view>
+    
+    <view class="detail-item">
+      <text class="label">交易时间:</text>
+      <text>{{trade.date}}</text>
+    </view>
+    
+    <view class="detail-item" wx:if="{{trade.profit !== undefined}}">
+      <text class="label">盈亏:</text>
+      <text class="trade-{{trade.profit >= 0 ? 'positive' : 'negative'}}">¥{{trade.profit}}</text>
+    </view>
+    
+    <view class="actions">
+      <button class="btn-danger" bindtap="deleteTrade">删除记录</button>
+    </view>
+  </view>
+</view>

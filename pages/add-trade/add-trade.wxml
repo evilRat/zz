@@ -1,0 +1,53 @@
+<view class="container">
+  <form class="trade-form" bindsubmit="submitTrade">
+    <view class="form-item">
+      <text>股票/基金代码</text>
+      <input type="text" placeholder="请输入股票或基金代码" value="{{stockCode}}" bindinput="onStockCodeInput" />
+    </view>
+    
+    <view class="form-item">
+      <text>股票/基金名称</text>
+      <input type="text" placeholder="请输入股票或基金名称" value="{{stockName}}" bindinput="onStockNameInput" />
+    </view>
+    
+    <view class="form-item">
+      <text>交易类型</text>
+      <view class="type-selector">
+        <radio-group bindchange="onTypeChange">
+          <label class="radio-item">
+            <radio value="buy" checked="{{tradeType === 'buy'}}" />买入
+          </label>
+          <label class="radio-item">
+            <radio value="sell" checked="{{tradeType === 'sell'}}" />卖出
+          </label>
+        </radio-group>
+      </view>
+    </view>
+    
+    <view class="form-item">
+      <text>交易价格</text>
+      <input type="digit" placeholder="请输入交易价格" value="{{price}}" bindinput="onPriceInput" />
+    </view>
+    
+    <view class="form-item">
+      <text>交易数量</text>
+      <input type="number" placeholder="请输入交易数量" value="{{quantity}}" bindinput="onQuantityInput" />
+    </view>
+    
+    <view class="form-item">
+      <text>交易时间</text>
+      <picker mode="date" value="{{date}}" bindchange="onDateChange">
+        <view class="picker">
+          {{date ? date : '请选择交易时间'}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="form-item">
+      <text>交易金额</text>
+      <input type="digit" disabled value="{{amount}}" />
+    </view>
+    
+    <button class="btn-primary" form-type="submit">保存记录</button>
+  </form>
+</view>
