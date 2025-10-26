@@ -9,28 +9,63 @@
 
   <!-- 交易记录列表 -->
   <view class="trade-list">
-    <view class="trade-item trade-header">
-      <text>股票/基金</text>
-      <text>类型</text>
-      <text>价格</text>
-      <text>数量</text>
-      <text>金额</text>
+    <view class="trade-header">
+      <text>交易记录</text>
+      <text>详情</text>
     </view>
-    <view wx:for="{{trades}}" wx:key="id" class="trade-item" data-id="{{item.id}}" bindtap="goToDetail">
-      <view>
-        <text>{{item.stockName}}</text>
-        <text class="trade-{{item.type}}">{{item.type === 'buy' ? '买入' : '卖出'}}</text>
+    
+    <view wx:if="{{trades.length === 0}}" class="empty-state">
+      <view class="empty-icon">📊</view>
+      <view>暂无交易记录</view>
+      <view class="empty-hint">点击右下角按钮添加第一条记录</view>
+    </view>
+    
+    <view wx:for="{{trades}}" wx:key="id" class="trade-item {{item.type}}" data-id="{{item.id}}" bindtap="goToDetail">
+      <view class="trade-row">
+        <view>
+          <text class="stock-info">{{item.stockName}}</text>
+          <view class="trade-info-row">
+            <text class="trade-type trade-{{item.type}}">{{item.type === 'buy' ? '买入' : '卖出'}}</text>
+            <text class="market-badge">{{item.market}}</text>
+          </view>
+        </view>
+        <view class="trade-date-container">
+          <text class="trade-date">{{item.date}}</text>
+        </view>
       </view>
-      <view>
-        <text>{{item.price}}</text>
-        <text>{{item.quantity}}</text>
-        <text class="trade-{{item.profit >= 0 ? 'positive' : 'negative'}}">{{item.amount}}</text>
+      
+      <view class="trade-details">
+        <view class="detail-item">
+          <text class="detail-label">价格</text>
+          <text class="detail-value">¥{{item.price}}</text>
+        </view>
+        
+        <view class="detail-item">
+          <text class="detail-label">数量</text>
+          <text class="detail-value">{{item.quantity}}</text>
+        </view>
+        
+        <view class="detail-item">
+          <text class="detail-label">金额</text>
+          <text class="detail-value detail-amount">¥{{item.amount}}</text>
+        </view>
+      </view>
+      
+      <view class="trade-footer">
+        <view>
+          <text class="detail-label">未匹配: </text>
+          <text class="detail-value">{{item.remainingQuantity || item.quantity}}</text>
+        </view>
+        <view wx:if="{{item.profit !== undefined}}">
+          <text class="detail-label">本次盈亏: </text>
+          <text class="detail-value {{item.profit >= 0 ? 'profit-positive' : 'profit-negative'}}">
+            ¥{{item.profit}}
+          </text>
+        </view>
       </view>
     </view>
   </view>
 
   <!-- 添加按钮 -->
-  <view class="add-button" bindtap="goToAddTrade">
-    <image src="/images/add.png" mode="aspectFit"></image>
-  </view>
+  <view class="add-button" bindtap="goToAddTrade"></view>
 </view>

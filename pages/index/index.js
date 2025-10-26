@@ -1,3 +1,6 @@
+// 引入计算工具函数
+const { updateAllTradesMatching } = require('../../utils/calculations.js');
+
 Page({
   data: {
     currentStock: 'all',
@@ -6,30 +9,7 @@ Page({
       { id: 2, code: '600036', name: '招商银行' },
       { id: 3, code: '510310', name: '沪深300ETF' }
     ],
-    trades: [
-      { 
-        id: 1, 
-        stockCode: '000001', 
-        stockName: '平安银行', 
-        type: 'buy', 
-        price: 15.2, 
-        quantity: 1000, 
-        amount: 15200,
-        date: '2023-01-15',
-        profit: 0
-      },
-      { 
-        id: 2, 
-        stockCode: '600036', 
-        stockName: '招商银行', 
-        type: 'sell', 
-        price: 35.8, 
-        quantity: 500, 
-        amount: 17900,
-        date: '2023-01-16',
-        profit: 1200
-      }
-    ]
+    trades: []
   },
 
   onLoad() {
@@ -43,11 +23,111 @@ Page({
   },
 
   loadTrades() {
-    // 模拟从本地存储加载数据
-    const trades = wx.getStorageSync('trades') || [];
+    // 从云端加载数据
+    wx.cloud.callFunction({
+      name: 'tradeOperations',
+      data: {
+        operation: 'getAllTrades'
+      },
+      success: res => {
+        if (res.result.success) {
+          let trades = res.result.data || [];
+          
+          // 重新计算所有交易的匹配状态以确保数据一致性
+          if (trades.length > 0) {
+            trades = updateAllTradesMatching(trades);
+          }
+          
+          // 为每个交易添加市场类型标识
+          const tradesWithMarket = trades.map(trade => {
+            return {
+              ...trade,
+              market: this.getMarketType(trade.stockCode)
+            };
+          });
+          
+          this.setData({ trades: tradesWithMarket });
+          
+          // 更新股票列表，包含用户添加的所有股票
+          this.updateStockList(tradesWithMarket);
+        } else {
+          console.error('获取交易记录失败', res.result.message);
+          // 如果云端获取失败，尝试从本地存储加载
+          this.loadTradesFromLocalStorage();
+        }
+      },
+      fail: err => {
+        console.error('调用云函数失败', err);
+        // 如果云端获取失败，尝试从本地存储加载
+        this.loadTradesFromLocalStorage();
+      }
+    });
+  },
+  
+  loadTradesFromLocalStorage() {
+    // 从本地存储加载数据（作为备选方案）
+    let trades = wx.getStorageSync('trades') || [];
+    
+    // 重新计算所有交易的匹配状态以确保数据一致性
     if (trades.length > 0) {
-      this.setData({ trades });
+      trades = updateAllTradesMatching(trades);
     }
+    
+    // 为每个交易添加市场类型标识
+    const tradesWithMarket = trades.map(trade => {
+      return {
+        ...trade,
+        market: this.getMarketType(trade.stockCode)
+      };
+    });
+    
+    this.setData({ trades: tradesWithMarket });
+    
+    // 更新股票列表，包含用户添加的所有股票
+    this.updateStockList(tradesWithMarket);
+  },
+
+  // 根据股票代码判断市场类型
+  getMarketType(stockCode) {
+    // A股: 6位数字代码，以0、3、6开头
+    if (/^[036]\d{5}$/.test(stockCode)) {
+      return 'A股';
+    }
+    // 港股: 5位数字代码，以0开头
+    if (/^0\d{4}$/.test(stockCode)) {
+      return '港股';
+    }
+    // 美股: 字母代码
+    if (/^[A-Z]+$/.test(stockCode)) {
+      return '美股';
+    }
+    // 默认
+    return '其他';
+  },
+
+  updateStockList(trades) {
+    // 从交易记录中提取唯一的股票信息
+    const uniqueStocks = {};
+    trades.forEach(trade => {
+      if (!uniqueStocks[trade.stockCode]) {
+        uniqueStocks[trade.stockCode] = {
+          code: trade.stockCode,
+          name: trade.stockName
+        };
+      }
+    });
+    
+    // 转换为数组并更新数据
+    const stockList = Object.values(uniqueStocks).map((stock, index) => ({
+      id: index + 1,
+      code: stock.code,
+      name: stock.name
+    }));
+    
+    // 保持"全部"选项在第一位
+    this.setData({
+      stocks: stockList
+    });
   },
 
   selectStock(e) {
@@ -58,10 +138,61 @@ Page({
     if (stockCode === 'all') {
       this.loadTrades();
     } else {
-      const allTrades = wx.getStorageSync('trades') || this.data.trades;
-      const filteredTrades = allTrades.filter(trade => trade.stockCode === stockCode);
-      this.setData({ trades: filteredTrades });
+      // 从云端加载数据
+      wx.cloud.callFunction({
+        name: 'tradeOperations',
+        data: {
+          operation: 'getAllTrades'
+        },
+        success: res => {
+          if (res.result.success) {
+            let allTrades = res.result.data || [];
+            
+            // 重新计算所有交易的匹配状态以确保数据一致性
+            if (allTrades.length > 0) {
+              allTrades = updateAllTradesMatching(allTrades);
+            }
+            
+            const tradesWithMarket = allTrades.map(trade => {
+              return {
+                ...trade,
+                market: this.getMarketType(trade.stockCode)
+              };
+            });
+            const filteredTrades = tradesWithMarket.filter(trade => trade.stockCode === stockCode);
+            this.setData({ trades: filteredTrades });
+          } else {
+            console.error('获取交易记录失败', res.result.message);
+            // 如果云端获取失败，尝试从本地存储加载
+            this.selectStockFromLocalStorage(stockCode);
+          }
+        },
+        fail: err => {
+          console.error('调用云函数失败', err);
+          // 如果云端获取失败，尝试从本地存储加载
+          this.selectStockFromLocalStorage(stockCode);
+        }
+      });
     }
+  },
+  
+  selectStockFromLocalStorage(stockCode) {
+    // 从本地存储加载数据（作为备选方案）
+    let allTrades = wx.getStorageSync('trades') || [];
+    
+    // 重新计算所有交易的匹配状态以确保数据一致性
+    if (allTrades.length > 0) {
+      allTrades = updateAllTradesMatching(allTrades);
+    }
+    
+    const tradesWithMarket = allTrades.map(trade => {
+      return {
+        ...trade,
+        market: this.getMarketType(trade.stockCode)
+      };
+    });
+    const filteredTrades = tradesWithMarket.filter(trade => trade.stockCode === stockCode);
+    this.setData({ trades: filteredTrades });
   },
 
   goToDetail(e) {
@@ -76,4 +207,4 @@ Page({
       url: '/pages/add-trade/add-trade'
     });
   }
-});
+})

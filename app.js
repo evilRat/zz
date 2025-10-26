@@ -1,10 +1,20 @@
+// 引入计算工具函数
+const { updateAllTradesMatching } = require('./utils/calculations.js');
+
 App({
   onLaunch() {
     // 初始化云开发环境（如果需要）
-    // wx.cloud.init({
-    //   env: 'your-env-id',
-    //   traceUser: true
-    // })
+    if (!wx.cloud) {
+      console.error('请使用 2.2.3 或以上的基础库以使用云能力')
+    } else {
+      wx.cloud.init({
+        env: 'cloud1-0g3cee9f69e9fc0d',
+        traceUser: true
+      })
+    }
+    
+    // 初始化测试数据
+    this.initTestData();
     
     // 获取用户信息
     wx.getSetting({
@@ -27,6 +37,12 @@ App({
       }
     })
   },
+  
+  initTestData() {
+    // 不再添加测试数据，用户需要自己添加交易记录
+    console.log('Test data initialization disabled');
+  },
+  
   globalData: {
     userInfo: null,
     trades: []

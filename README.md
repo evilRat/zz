@@ -45,6 +45,12 @@ zz/
 - 实时计算交易金额
 - 数据验证和提交功能
 
+## 测试数据
+程序首次运行时会自动添加以下测试数据：
+- **A股 (A-Shares)**: 平安银行、招商银行、贵州茅台
+- **港股 (Hong Kong Stocks)**: 腾讯控股、阿里巴巴、小米集团
+- **美股 (US Stocks)**: Apple、Tesla、Google
+
 ## 数据存储
 目前使用微信小程序的本地存储(wx.setStorageSync/wx.getStorageSync)来保存交易记录。
 

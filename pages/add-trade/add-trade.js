@@ -1,5 +1,5 @@
 // 引入计算工具函数
-const { calculateProfit, findMatchedTrades } = require('../../utils/calculations.js');
+const { calculateProfitEnhanced, updateAllTradesMatching } = require('../../utils/calculations.js');
 
 Page({
   data: {
@@ -35,9 +35,11 @@ Page({
     });
   },
 
+  // Updated to handle tap events on the new type selector
   onTypeChange(e) {
+    const type = e.currentTarget.dataset.value || e.detail.value;
     this.setData({
-      tradeType: e.detail.value
+      tradeType: type
     });
   },
 
@@ -124,31 +126,85 @@ Page({
       quantity: parseInt(this.data.quantity),
       amount: parseFloat(this.data.amount),
       date: this.data.date,
-      profit: 0 // 初始盈亏为0，后续计算
+      profit: 0, // 初始盈亏为0，后续计算
+      matches: [], // 匹配详情
+      remainingQuantity: parseInt(this.data.quantity) // 剩余未匹配数量
     };
 
-    // 保存到本地存储
-    const trades = wx.getStorageSync('trades') || [];
-    trades.push(newTrade);
-    
-    // 计算盈亏
-    const profit = calculateProfit(trades, newTrade);
-    newTrade.profit = profit;
-    
-    // 更新刚添加的交易记录的盈亏
-    trades[trades.length - 1] = newTrade;
-    
-    wx.setStorageSync('trades', trades);
-
-    // 提示成功并返回首页
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success'
+    // 从云端获取所有现有交易记录
+    wx.cloud.callFunction({
+      name: 'tradeOperations',
+      data: {
+        operation: 'getAllTrades'
+      },
+      success: res => {
+        if (res.result.success) {
+          let allTrades = res.result.data || [];
+          
+          // 计算盈亏和匹配详情
+          const profitResult = calculateProfitEnhanced(allTrades, newTrade);
+          
+          // 更新新交易的盈亏和匹配信息
+          newTrade.profit = profitResult.totalProfit;
+          newTrade.matches = profitResult.matchDetails;
+          newTrade.remainingQuantity = profitResult.remainingQuantity;
+          
+          // 保存新交易到云端
+          this.saveTradeToCloud(newTrade);
+        } else {
+          console.error('获取交易记录失败', res.result.message);
+          wx.showToast({
+            title: '保存失败',
+            icon: 'none'
+          });
+        }
+      },
+      fail: err => {
+        console.error('调用云函数失败', err);
+        wx.showToast({
+          title: '保存失败',
+          icon: 'none'
+        });
+      }
     });
 
-    // 延迟返回首页
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 1500);
+  },
+  
+  saveTradeToCloud(newTrade) {
+    // 保存交易到云端
+    wx.cloud.callFunction({
+      name: 'tradeOperations',
+      data: {
+        operation: 'addTrade',
+        data: newTrade
+      },
+      success: res => {
+        if (res.result.success) {
+          // 提示成功并返回首页
+          wx.showToast({
+            title: '保存成功',
+            icon: 'success'
+          });
+          
+          // 延迟返回首页
+          setTimeout(() => {
+            wx.navigateBack();
+          }, 1500);
+        } else {
+          console.error('保存交易失败', res.result.message);
+          wx.showToast({
+            title: '保存失败',
+            icon: 'none'
+          });
+        }
+      },
+      fail: err => {
+        console.error('调用云函数失败', err);
+        wx.showToast({
+          title: '保存失败',
+          icon: 'none'
+        });
+      }
+    });
   }
-});
+})

@@ -1,0 +1,33 @@
+<view class="container">
+  <view class="user-info">
+    <block wx:if="{{hasUserInfo}}">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <text class="nickname">{{userInfo.nickName}}</text>
+      <view class="user-details">
+        <view class="detail-item">
+          <text class="label">城市:</text>
+          <text>{{userInfo.city}}, {{userInfo.province}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="label">性别:</text>
+          <text wx:if="{{userInfo.gender === 1}}">男</text>
+          <text wx:if="{{userInfo.gender === 2}}">女</text>
+          <text wx:if="{{userInfo.gender === 0}}">未知</text>
+        </view>
+        <view class="detail-item">
+          <text class="label">语言:</text>
+          <text>{{userInfo.language}}</text>
+        </view>
+      </view>
+    </block>
+    
+    <block wx:else>
+      <view class="no-user-info">
+        <text>需要获取您的用户信息才能显示个人资料</text>
+        <button class="get-info-btn" bind:tap="getUserInfo">
+          获取用户信息
+        </button>
+      </view>
+    </block>
+  </view>
+</view>

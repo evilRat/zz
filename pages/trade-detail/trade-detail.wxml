@@ -1,42 +1,88 @@
 <view class="container">
+  <view class="page-header">
+    <view class="page-title">交易详情</view>
+    <view class="page-subtitle">查看交易记录详细信息</view>
+  </view>
+  
+  <view class="trade-overview">
+    <view class="stock-name">{{trade.stockName}}</view>
+    <view class="stock-code">{{trade.stockCode}}</view>
+    <view class="badge-container">
+      <view class="trade-type-badge badge-{{trade.type}}">{{trade.type === 'buy' ? '买入' : '卖出'}}</view>
+      <view class="market-type-badge">
+        {{marketType}}
+      </view>
+    </view>
+    <view class="trade-amount">¥{{trade.amount}}</view>
+    <view wx:if="{{trade.profit !== undefined}}" class="trade-profit {{trade.profit >= 0 ? 'profit-positive' : 'profit-negative'}}">
+      本次交易盈亏: ¥{{trade.profit}}
+    </view>
+  </view>
+  
   <view class="trade-detail">
-    <view class="detail-item">
-      <text class="label">股票/基金:</text>
-      <text>{{trade.stockName}}({{trade.stockCode}})</text>
+    <view class="detail-card">
+      <view class="card-title">交易信息</view>
+      <view class="detail-grid">
+        <view class="detail-item">
+          <text class="detail-label">交易类型</text>
+          <text class="detail-value">{{trade.type === 'buy' ? '买入' : '卖出'}}</text>
+        </view>
+        
+        <view class="detail-item">
+          <text class="detail-label">交易价格</text>
+          <text class="detail-value">¥{{trade.price}}</text>
+        </view>
+        
+        <view class="detail-item">
+          <text class="detail-label">交易数量</text>
+          <text class="detail-value">{{trade.quantity}}</text>
+        </view>
+        
+        <view class="detail-item">
+          <text class="detail-label">交易时间</text>
+          <text class="detail-value">{{trade.date}}</text>
+        </view>
+        
+        <view class="detail-item">
+          <text class="detail-label">剩余未匹配</text>
+          <text class="detail-value">{{trade.remainingQuantity || trade.quantity}}</text>
+        </view>
+      </view>
     </view>
     
-    <view class="detail-item">
-      <text class="label">交易类型:</text>
-      <text class="trade-{{trade.type}}">{{trade.type === 'buy' ? '买入' : '卖出'}}</text>
+    <!-- 匹配详情 -->
+    <view wx:if="{{trade.matches && trade.matches.length > 0}}" class="detail-card">
+      <view class="card-title">匹配详情</view>
+      <view wx:for="{{trade.matches}}" wx:key="index" class="match-item">
+        <view wx:if="{{trade.type === 'sell'}}">
+          <view class="match-row">
+            <text>买入价格: ¥{{item.buyPrice}}</text>
+            <text>{{item.buyDate}}</text>
+          </view>
+          <view class="match-row">
+            <text>卖出价格: ¥{{item.sellPrice}}</text>
+            <text>{{item.sellDate}}</text>
+          </view>
+        </view>
+        <view wx:else>
+          <view class="match-row">
+            <text>买入价格: ¥{{item.buyPrice}}</text>
+            <text>{{item.buyDate}}</text>
+          </view>
+          <view class="match-row">
+            <text>卖出价格: ¥{{item.sellPrice}}</text>
+            <text>{{item.sellDate}}</text>
+          </view>
+        </view>
+        <view class="match-footer">
+          <text>匹配数量: {{item.quantity}}</text>
+          <text class="{{item.profit >= 0 ? 'profit-positive' : 'profit-negative'}}">盈亏: ¥{{item.profit}}</text>
+        </view>
+      </view>
     </view>
-    
-    <view class="detail-item">
-      <text class="label">交易价格:</text>
-      <text>¥{{trade.price}}</text>
-    </view>
-    
-    <view class="detail-item">
-      <text class="label">交易数量:</text>
-      <text>{{trade.quantity}}</text>
-    </view>
-    
-    <view class="detail-item">
-      <text class="label">交易金额:</text>
-      <text>¥{{trade.amount}}</text>
-    </view>
-    
-    <view class="detail-item">
-      <text class="label">交易时间:</text>
-      <text>{{trade.date}}</text>
-    </view>
-    
-    <view class="detail-item" wx:if="{{trade.profit !== undefined}}">
-      <text class="label">盈亏:</text>
-      <text class="trade-{{trade.profit >= 0 ? 'positive' : 'negative'}}">¥{{trade.profit}}</text>
-    </view>
-    
-    <view class="actions">
-      <button class="btn-danger" bindtap="deleteTrade">删除记录</button>
-    </view>
+  </view>
+  
+  <view class="actions">
+    <button class="btn-danger" bindtap="deleteTrade">删除记录</button>
   </view>
 </view>
