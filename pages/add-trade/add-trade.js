@@ -1,10 +1,16 @@
 // 引入计算工具函数
 const { calculateProfitEnhanced, updateAllTradesMatching } = require('../../utils/calculations.js');
+// 引入股票工具函数
+const { getStockInfoByCode, getStockNameByCode, isValidStockCode, getCachedStocks, cacheStockCodeMap } = require('../../utils/stockUtils.js');
+
+// 输入防抖定时器
+let stockCodeTimer = null;
 
 Page({
   data: {
     stockCode: '',
     stockName: '',
+    stockMarket: '', // 新增：股票市场信息
     tradeType: 'buy',
     price: '',
     quantity: '',
@@ -24,9 +30,69 @@ Page({
   },
 
   onStockCodeInput(e) {
+    const stockCode = e.detail.value;
     this.setData({
-      stockCode: e.detail.value
+      stockCode: stockCode
     });
+    
+    // 清除之前的定时器
+    if (stockCodeTimer) {
+      clearTimeout(stockCodeTimer);
+    }
+    
+    // 防抖处理，延迟触发代码识别
+    stockCodeTimer = setTimeout(() => {
+      // 检查代码格式是否有效
+      if (isValidStockCode(stockCode)) {
+        this.identifyStockByName(stockCode);
+      }
+    }, 500); // 500ms防抖延迟
+  },
+  
+  /**
+   * 根据股票代码识别股票信息（名称和市场）
+   * @param {string} stockCode - 股票代码
+   */
+  async identifyStockByName(stockCode) {
+    try {
+      // 1. 先检查本地缓存
+      const cachedStocks = getCachedStocks();
+      if (cachedStocks[stockCode]) {
+        // 如果缓存中有，则直接使用缓存值
+        const stockInfo = cachedStocks[stockCode];
+        this.setData({
+          stockName: stockInfo.name || stockInfo, // 兼容旧的缓存格式
+          stockMarket: stockInfo.market || ''
+        });
+        return;
+      }
+      
+      // 2. 显示加载提示
+      wx.showLoading({
+        title: '识别中...',
+        mask: false
+      });
+      
+      // 3. 调用股票识别函数，获取股票信息（包含名称和市场）
+      const stockInfo = await getStockInfoByCode(stockCode);
+      
+      // 4. 如果识别到了股票信息，则更新到表单
+      if (stockInfo.name) {
+        this.setData({
+          stockName: stockInfo.name,
+          stockMarket: stockInfo.market || ''
+        });
+        
+        // 5. 更新缓存
+        cachedStocks[stockCode] = stockInfo;
+        cacheStockCodeMap(cachedStocks);
+      }
+    } catch (error) {
+      console.error('股票代码识别失败:', error);
+    } finally {
+      // 隐藏加载提示
+      wx.hideLoading();
+    }
   },
 
   onStockNameInput(e) {
@@ -121,6 +187,7 @@ Page({
       id: Date.now(), // 使用时间戳作为唯一ID
       stockCode: this.data.stockCode,
       stockName: this.data.stockName,
+      stockMarket: this.data.stockMarket || 'unknown', // 添加股票市场信息
       type: this.data.tradeType,
       price: parseFloat(this.data.price),
       quantity: parseInt(this.data.quantity),
