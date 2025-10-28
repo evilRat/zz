@@ -1,0 +1,74 @@
+<view class="container">
+  <view class="filter-bar">
+    <view class="filter-item {{statusFilter === 'all' ? 'active' : ''}}" bindtap="filterByStatus" data-status="all">
+      全部
+    </view>
+    <view class="filter-item {{statusFilter === 'incomplete' ? 'active' : ''}}" bindtap="filterByStatus" data-status="incomplete">
+      未完成
+    </view>
+    <view class="filter-item {{statusFilter === 'completed' ? 'active' : ''}}" bindtap="filterByStatus" data-status="completed">
+      已完成
+    </view>
+  </view>
+  
+  <view class="bill-list">
+    <block wx:for="{{getFilteredTBills()}}" wx:key="id">
+      <view class="bill-item" bindtap="onBillTap" data-id="{{item._id || item.id}}">
+        <view class="bill-header">
+          <view class="stock-info">
+            <text class="stock-name">{{item.stockName}}</text>
+            <text class="stock-code">{{item.stockCode}} {{getMarketType(item.stockCode)}}</text>
+          </view>
+          <view class="t-type {{item.tType}}">
+            {{item.tType === 'buySell' ? '先买后卖' : '先卖后买'}}
+          </view>
+        </view>
+        
+        <view class="bill-content">
+          <view class="trade-info">
+            <view class="trade-row">
+              <view class="trade-label">买入:</view>
+              <view class="trade-value">
+                <text class="price">¥{{item.buyPrice || '-'}}</text>
+                <text class="quantity">{{item.buyQuantity || '-'}}股</text>
+              </view>
+            </view>
+            <view class="trade-row">
+              <view class="trade-label">卖出:</view>
+              <view class="trade-value">
+                <text class="price">¥{{item.sellPrice || '-'}}</text>
+                <text class="quantity">{{item.sellQuantity || '-'}}股</text>
+              </view>
+            </view>
+          </view>
+          
+          <view class="status-info">
+            <view class="date">{{item.date || '-'}}</view>
+            <view class="status {{item.completed ? 'completed' : 'incomplete'}}">
+              {{item.completed ? '已完成' : '未完成'}}
+            </view>
+          </view>
+        </view>
+        
+        <view class="profit-info" wx:if="{{item.completed && item.profit !== undefined}}">
+          <text class="profit-label">盈亏:</text>
+          <text class="profit-value {{item.profit >= 0 ? 'profit' : 'loss'}}">
+            {{item.profit >= 0 ? '+' : ''}}¥{{item.profit}}
+          </text>
+          <text class="profit-rate {{item.profit >= 0 ? 'profit' : 'loss'}}">
+            ({{item.profitRate >= 0 ? '+' : ''}}{{item.profitRate}}%)
+          </text>
+        </view>
+      </view>
+    </block>
+    
+    <view class="empty-tip" wx:if="{{getFilteredTBills().length === 0}}">
+      <text>暂无T账单记录</text>
+    </view>
+  </view>
+  
+  <!-- 右下角半透明加号按钮 -->
+  <view class="add-button" bindtap="onAddButtonTap">
+    <image src="/images/add.png" mode="aspectFit"></image>
+  </view>
+</view>

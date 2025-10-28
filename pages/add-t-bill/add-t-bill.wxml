@@ -1,0 +1,92 @@
+<view class="container">
+  <view class="type-selector">
+    <view class="type-item {{tType === 'buySell' ? 'active' : ''}}" bindtap="onTTypeChange" data-type="buySell">
+      先买后卖
+    </view>
+    <view class="type-item {{tType === 'sellBuy' ? 'active' : ''}}" bindtap="onTTypeChange" data-type="sellBuy">
+      先卖后买
+    </view>
+  </view>
+  
+  <view class="form-section">
+    <view class="form-group">
+      <view class="form-label">股票代码</view>
+      <input class="form-input" placeholder="请输入股票代码" value="{{stockCode}}" bindinput="onStockCodeInput" />
+    </view>
+    
+    <view class="form-group">
+      <view class="form-label">股票名称</view>
+      <input class="form-input" placeholder="请输入股票名称" value="{{stockName}}" bindinput="onStockNameInput" />
+    </view>
+    
+    <view class="form-group">
+      <view class="form-label">交易日期</view>
+      <picker mode="date" value="{{date}}" start="2010-01-01" end="{{date}}" bindchange="onDateChange">
+        <view class="form-picker">
+          {{date}}
+        </view>
+      </picker>
+    </view>
+  </view>
+  
+  <!-- 买入信息部分 -->
+  <view class="form-section" wx:if="{{showBuySection}}">
+    <view class="section-title">买入信息</view>
+    
+    <view class="form-group">
+      <view class="form-label">买入价格</view>
+      <input type="digit" class="form-input" placeholder="请输入买入价格" value="{{buyPrice}}" bindinput="onBuyPriceInput" />
+    </view>
+    
+    <view class="form-group">
+      <view class="form-label">买入数量</view>
+      <input type="number" class="form-input" placeholder="请输入买入数量" value="{{buyQuantity}}" bindinput="onBuyQuantityInput" />
+    </view>
+  </view>
+  
+  <!-- 卖出信息部分 -->
+  <view class="form-section" wx:if="{{showSellSection}}">
+    <view class="section-title">卖出信息</view>
+    
+    <view class="form-group">
+      <view class="form-label">卖出价格</view>
+      <input type="digit" class="form-input" placeholder="请输入卖出价格" value="{{sellPrice}}" bindinput="onSellPriceInput" />
+    </view>
+    
+    <view class="form-group">
+      <view class="form-label">卖出数量</view>
+      <input type="number" class="form-input" placeholder="请输入卖出数量" value="{{sellQuantity}}" bindinput="onSellQuantityInput" />
+    </view>
+  </view>
+  
+  <!-- 盈亏信息 -->
+  <view class="profit-section" wx:if="{{completed}}">
+    <view class="profit-item">
+      <view class="profit-label">盈亏金额:</view>
+      <view class="profit-value {{profit >= 0 ? 'profit' : 'loss'}}">
+        {{profit >= 0 ? '+' : ''}}¥{{profit}}
+      </view>
+    </view>
+    
+    <view class="profit-item">
+      <view class="profit-label">盈亏比例:</view>
+      <view class="profit-value {{profit >= 0 ? 'profit' : 'loss'}}">
+        {{profitRate >= 0 ? '+' : ''}}{{profitRate}}%
+      </view>
+    </view>
+  </view>
+  
+  <!-- 操作按钮 -->
+  <view class="button-container">
+    <button class="submit-button" type="primary" bindtap="submitBill">
+      {{isEdit ? '保存修改' : '保存账单'}}
+    </button>
+    
+    <!-- 下一步按钮，用于分步骤填写 -->
+    <button class="next-button" type="default" bindtap="onNextStep" 
+            wx:if="{{!completed && ((tType === 'buySell' && showBuySection && !showSellSection && buyPrice && buyQuantity) || 
+                                  (tType === 'sellBuy' && showSellSection && !showBuySection && sellPrice && sellQuantity))}}">
+      下一步
+    </button>
+  </view>
+</view>

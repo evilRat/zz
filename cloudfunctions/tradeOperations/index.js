@@ -64,6 +64,75 @@ exports.main = async (event, context) => {
           data: getResult.data[0] || null
         }
       
+      // T账单相关操作
+      case 'getAllTBills':
+        // 获取所有T账单记录
+        const getAllTBillsResult = await db.collection('tbills').where({
+          _openid: wxContext.OPENID
+        }).orderBy('date', 'desc').get()
+        
+        return {
+          success: true,
+          data: getAllTBillsResult.data
+        }
+      
+      case 'addTBill':
+        // 添加新的T账单
+        const addTBillResult = await db.collection('tbills').add({
+          data: {
+            ...data,
+            _openid: wxContext.OPENID,
+            createTime: db.serverDate(),
+            updateTime: db.serverDate()
+          }
+        })
+        
+        return {
+          success: true,
+          data: addTBillResult
+        }
+      
+      case 'updateTBill':
+        // 更新T账单
+        const updateTBillResult = await db.collection('tbills').where({
+          _id: data.billId,
+          _openid: wxContext.OPENID
+        }).update({
+          data: {
+            ...data,
+            updateTime: db.serverDate()
+          }
+        })
+        
+        return {
+          success: true,
+          data: updateTBillResult
+        }
+      
+      case 'getTBillById':
+        // 根据ID获取T账单
+        const getTBillResult = await db.collection('tbills').where({
+          _id: data.billId,
+          _openid: wxContext.OPENID
+        }).get()
+        
+        return {
+          success: true,
+          data: getTBillResult.data[0] || null
+        }
+      
+      case 'deleteTBill':
+        // 删除T账单
+        const deleteTBillResult = await db.collection('tbills').where({
+          _id: data.billId,
+          _openid: wxContext.OPENID
+        }).remove()
+        
+        return {
+          success: true,
+          data: deleteTBillResult
+        }
+      
       default:
         return {
           success: false,
