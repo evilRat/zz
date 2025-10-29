@@ -78,81 +78,86 @@
 }
 
 .bill-content {
-  display: flex;
-  justify-content: space-between;
   margin-bottom: 16rpx;
 }
 
 .trade-info {
   display: flex;
   flex-direction: column;
+  margin-bottom: 16rpx;
 }
 
-.trade-row {
-  display: flex;
-  margin-bottom: 12rpx;
+.trade-section {
+  margin-bottom: 16rpx;
+  padding: 16rpx;
+  background: #fafafa;
+  border-radius: 8rpx;
 }
 
-.trade-row:last-child {
+.trade-section:last-child {
   margin-bottom: 0;
 }
 
-.trade-label {
-  font-size: 28rpx;
-  color: #666;
-  width: 80rpx;
-}
-
-.trade-value {
-  display: flex;
-  flex-direction: column;
-}
-
-.price {
-  font-size: 32rpx;
+.trade-section-title {
+  font-size: 26rpx;
   font-weight: 600;
   color: #333;
+  margin-bottom: 12rpx;
 }
 
-.quantity {
+.trade-details {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.trade-detail-item {
+  display: flex;
+  align-items: center;
+  width: 50%;
+  margin-bottom: 8rpx;
+}
+
+.detail-label {
   font-size: 24rpx;
   color: #666;
-  margin-top: 4rpx;
+  margin-right: 8rpx;
+}
+
+.detail-value {
+  font-size: 24rpx;
+  color: #333;
+  font-weight: 500;
 }
 
 .status-info {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 16rpx;
+  background: #f8f8f8;
+  border-radius: 6rpx;
 }
 
 .date {
   font-size: 24rpx;
   color: #666;
-  margin-bottom: 8rpx;
 }
 
-.status {
-  padding: 8rpx 16rpx;
-  border-radius: 6rpx;
+.quantity-info {
   font-size: 24rpx;
-}
-
-.status.completed {
-  background: #f6ffed;
-  color: #52c41a;
-}
-
-.status.incomplete {
-  background: #fff1f0;
-  color: #ff4d4f;
+  color: #333;
+  font-weight: 500;
 }
 
 .profit-info {
-  display: flex;
-  align-items: center;
   padding-top: 16rpx;
   border-top: 1rpx solid #f0f0f0;
+}
+
+.profit-main {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
 }
 
 .profit-label {
@@ -164,11 +169,21 @@
 .profit-value {
   font-size: 32rpx;
   font-weight: 600;
+  margin-right: 8rpx;
 }
 
 .profit-rate {
   font-size: 28rpx;
-  margin-left: 8rpx;
+}
+
+.profit-details {
+  margin-top: 8rpx;
+}
+
+.profit-calculation {
+  font-size: 22rpx;
+  color: #999;
+  line-height: 1.4;
 }
 
 .profit {

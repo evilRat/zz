@@ -1,5 +1,3 @@
-// 引入计算工具函数
-const { calculateProfitEnhanced, updateAllTradesMatching } = require('../../utils/calculations.js');
 // 引入股票工具函数
 const { getStockInfoByCode, getStockNameByCode, isValidStockCode, getCachedStocks, cacheStockCodeMap } = require('../../utils/stockUtils.js');
 
@@ -193,48 +191,11 @@ Page({
       quantity: parseInt(this.data.quantity),
       amount: parseFloat(this.data.amount),
       date: this.data.date,
-      profit: 0, // 初始盈亏为0，后续计算
-      matches: [], // 匹配详情
-      remainingQuantity: parseInt(this.data.quantity) // 剩余未匹配数量
+      matchStatus: 'unmatched' // 设置默认状态为未匹配
     };
 
-    // 从云端获取所有现有交易记录
-    wx.cloud.callFunction({
-      name: 'tradeOperations',
-      data: {
-        operation: 'getAllTrades'
-      },
-      success: res => {
-        if (res.result.success) {
-          let allTrades = res.result.data || [];
-          
-          // 计算盈亏和匹配详情
-          const profitResult = calculateProfitEnhanced(allTrades, newTrade);
-          
-          // 更新新交易的盈亏和匹配信息
-          newTrade.profit = profitResult.totalProfit;
-          newTrade.matches = profitResult.matchDetails;
-          newTrade.remainingQuantity = profitResult.remainingQuantity;
-          
-          // 保存新交易到云端
-          this.saveTradeToCloud(newTrade);
-        } else {
-          console.error('获取交易记录失败', res.result.message);
-          wx.showToast({
-            title: '保存失败',
-            icon: 'none'
-          });
-        }
-      },
-      fail: err => {
-        console.error('调用云函数失败', err);
-        wx.showToast({
-          title: '保存失败',
-          icon: 'none'
-        });
-      }
-    });
-
+    // 直接保存新交易到云端，不进行自动匹配
+    this.saveTradeToCloud(newTrade);
   },
   
   saveTradeToCloud(newTrade) {

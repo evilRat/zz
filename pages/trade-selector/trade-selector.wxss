@@ -1,0 +1,380 @@
+/* 交易记录选择页面样式 */
+.container {
+  padding: 0;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 120rpx; /* 为底部操作栏留出空间 */
+}
+
+/* 筛选区域 */
+.filter-section {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  border-bottom: 1rpx solid #e5e5e5;
+}
+
+/* 搜索框 */
+.search-box {
+  position: relative;
+  margin-bottom: 30rpx;
+}
+
+.search-input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 80rpx 0 60rpx;
+  border: 2rpx solid #e5e5e5;
+  border-radius: 40rpx;
+  background-color: #f8f8f8;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  border-color: #007aff;
+  background-color: #fff;
+}
+
+.search-icon {
+  position: absolute;
+  left: 20rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32rpx;
+  color: #999;
+}
+
+.clear-icon {
+  position: absolute;
+  right: 20rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: #ccc;
+  color: #fff;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 筛选行 */
+.filter-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.filter-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-right: 20rpx;
+  min-width: 120rpx;
+}
+
+.filter-picker {
+  flex: 1;
+  padding: 20rpx;
+  border: 2rpx solid #e5e5e5;
+  border-radius: 8rpx;
+  background-color: #fff;
+}
+
+.picker-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 筛选信息 */
+.filter-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.filter-tag {
+  padding: 10rpx 20rpx;
+  background-color: #007aff;
+  color: #fff;
+  font-size: 24rpx;
+  border-radius: 20rpx;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 交易记录列表 */
+.trade-list {
+  padding: 0 30rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400rpx;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  margin-bottom: 10rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+}
+
+/* 交易记录项 */
+.trade-item {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.trade-item:active {
+  transform: scale(0.98);
+  background-color: #f8f8f8;
+}
+
+.trade-item.selected {
+  border: 2rpx solid #007aff;
+  background-color: #f0f8ff;
+}
+
+.trade-item.buy-type {
+  border-left: 6rpx solid #ff4757;
+}
+
+.trade-item.sell-type {
+  border-left: 6rpx solid #2ed573;
+}
+
+/* 选择指示器 */
+.selection-indicator {
+  margin-right: 20rpx;
+}
+
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.checkbox.checked {
+  background-color: #007aff;
+  border-color: #007aff;
+}
+
+.check-mark {
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+/* 交易信息 */
+.trade-info {
+  flex: 1;
+}
+
+.trade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.stock-info {
+  display: flex;
+  align-items: center;
+}
+
+.stock-code {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-right: 20rpx;
+}
+
+.stock-name {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.trade-type {
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.trade-type.buy {
+  background-color: #ffe6e6;
+  color: #ff4757;
+}
+
+.trade-type.sell {
+  background-color: #e6ffe6;
+  color: #2ed573;
+}
+
+/* 交易详情 */
+.trade-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10rpx;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+}
+
+.detail-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 10rpx;
+  min-width: 60rpx;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 选择箭头 */
+.select-arrow {
+  margin-left: 20rpx;
+}
+
+.arrow-icon {
+  font-size: 40rpx;
+  color: #ccc;
+}
+
+/* 底部操作栏 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  padding: 30rpx;
+  border-top: 1rpx solid #e5e5e5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.selected-count {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 20rpx;
+}
+
+.cancel-btn, .confirm-btn {
+  padding: 20rpx 40rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.confirm-btn {
+  background-color: #007aff;
+  color: #fff;
+}
+
+.confirm-btn.disabled {
+  background-color: #ccc;
+  color: #999;
+}
+
+.confirm-btn.active {
+  background-color: #007aff;
+  color: #fff;
+}
+
+/* 刷新按钮 */
+.refresh-btn {
+  position: fixed;
+  bottom: 200rpx;
+  right: 30rpx;
+  width: 80rpx;
+  height: 80rpx;
+  background-color: #007aff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+  z-index: 99;
+}
+
+.refresh-icon {
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+/* 响应式调整 */
+@media (max-width: 750rpx) {
+  .trade-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filter-label {
+    margin-bottom: 10rpx;
+  }
+  
+  .filter-picker {
+    width: 100%;
+  }
+}

@@ -1,0 +1,130 @@
+<!--交易记录选择页面-->
+<view class="container">
+  <!-- 搜索和筛选区域 -->
+  <view class="filter-section">
+    <!-- 搜索框 -->
+    <view class="search-box">
+      <input 
+        class="search-input" 
+        placeholder="搜索股票代码或名称" 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+      />
+      <view class="search-icon">🔍</view>
+      <view wx:if="{{searchKeyword}}" class="clear-icon" bindtap="onSearchClear">✕</view>
+    </view>
+    
+    <!-- 交易类型筛选 -->
+    <view class="filter-row">
+      <text class="filter-label">交易类型：</text>
+      <picker 
+        class="filter-picker" 
+        mode="selector" 
+        range="{{tradeTypeOptions}}" 
+        range-key="label"
+        value="{{tradeTypeOptions.findIndex(item => item.value === tradeType)}}"
+        bindchange="onTradeTypeChange"
+      >
+        <view class="picker-text">
+          {{tradeTypeOptions.find(item => item.value === tradeType).label}}
+        </view>
+      </picker>
+    </view>
+    
+    <!-- 筛选信息显示 -->
+    <view wx:if="{{stockCode || quantityFilter > 0}}" class="filter-info">
+      <text wx:if="{{stockCode}}" class="filter-tag">股票: {{stockCode}}</text>
+      <text wx:if="{{quantityFilter > 0}}" class="filter-tag">数量: {{quantityFilter}}</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 交易记录列表 -->
+  <view wx:else class="trade-list">
+    <view wx:if="{{filteredTrades.length === 0}}" class="empty-state">
+      <view class="empty-icon">📝</view>
+      <view class="empty-text">暂无可选择的交易记录</view>
+      <view class="empty-hint">请尝试调整筛选条件</view>
+    </view>
+    
+    <view wx:else>
+      <view 
+        wx:for="{{filteredTrades}}" 
+        wx:key="_id"
+        class="{{getTradeItemClass(item)}}"
+        data-id="{{item._id}}"
+        bindtap="onTradeSelect"
+      >
+        <!-- 选择状态指示器 -->
+        <view wx:if="{{selectionMode === 'multiple'}}" class="selection-indicator">
+          <view class="checkbox {{isTradeSelected(item._id) ? 'checked' : ''}}">
+            <text wx:if="{{isTradeSelected(item._id)}}" class="check-mark">✓</text>
+          </view>
+        </view>
+        
+        <!-- 交易信息 -->
+        <view class="trade-info">
+          <view class="trade-header">
+            <view class="stock-info">
+              <text class="stock-code">{{item.stockCode}}</text>
+              <text class="stock-name">{{item.stockName}}</text>
+            </view>
+            <view class="trade-type {{item.type === 'buy' ? 'buy' : 'sell'}}">
+              {{item.type === 'buy' ? '买入' : '卖出'}}
+            </view>
+          </view>
+          
+          <view class="trade-details">
+            <view class="detail-row">
+              <text class="detail-label">价格：</text>
+              <text class="detail-value">¥{{formatAmount(item.price)}}</text>
+            </view>
+            <view class="detail-row">
+              <text class="detail-label">数量：</text>
+              <text class="detail-value">{{item.quantity}}</text>
+            </view>
+            <view class="detail-row">
+              <text class="detail-label">金额：</text>
+              <text class="detail-value">¥{{formatAmount(item.amount)}}</text>
+            </view>
+            <view class="detail-row">
+              <text class="detail-label">日期：</text>
+              <text class="detail-value">{{item.date}}</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 选择箭头（单选模式） -->
+        <view wx:if="{{selectionMode === 'single'}}" class="select-arrow">
+          <text class="arrow-icon">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏（多选模式） -->
+  <view wx:if="{{selectionMode === 'multiple'}}" class="bottom-actions">
+    <view class="selected-count">
+      已选择 {{selectedTrades.length}} 项
+    </view>
+    <view class="action-buttons">
+      <button class="cancel-btn" bindtap="onCancel">取消</button>
+      <button 
+        class="confirm-btn {{selectedTrades.length > 0 ? 'active' : 'disabled'}}" 
+        bindtap="onConfirm"
+      >
+        {{confirmText}}
+      </button>
+    </view>
+  </view>
+
+  <!-- 刷新按钮 -->
+  <view class="refresh-btn" bindtap="onRefresh">
+    <text class="refresh-icon">↻</text>
+  </view>
+</view>

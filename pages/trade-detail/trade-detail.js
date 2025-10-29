@@ -1,7 +1,9 @@
 Page({
   data: {
     trade: {},
-    marketType: ''
+    marketType: '',
+    isEditable: true,
+    relatedTBill: null
   },
 
   onLoad(options) {
@@ -16,7 +18,7 @@ Page({
       data: {
         operation: 'getTradeById',
         data: {
-          id: id
+          tradeId: id
         }
       },
       success: res => {
@@ -24,10 +26,19 @@ Page({
           const trade = res.result.data;
           // Determine market type
           const marketType = this.getMarketType(trade.stockCode);
+          // Check if trade is editable
+          const isEditable = trade.matchStatus !== 'matched';
+          
           this.setData({ 
             trade,
-            marketType
+            marketType,
+            isEditable
           });
+          
+          // If trade is matched, load related T-bill information
+          if (trade.matchStatus === 'matched' && trade.tbillId) {
+            this.loadRelatedTBill(trade.tbillId);
+          }
         } else {
           console.error('获取交易详情失败', res.result.message);
           // 如果云端获取失败，尝试从本地存储加载
@@ -50,10 +61,19 @@ Page({
     if (trade) {
       // Determine market type
       const marketType = this.getMarketType(trade.stockCode);
+      // Check if trade is editable
+      const isEditable = trade.matchStatus !== 'matched';
+      
       this.setData({ 
         trade,
-        marketType
+        marketType,
+        isEditable
       });
+      
+      // If trade is matched, load related T-bill information
+      if (trade.matchStatus === 'matched' && trade.tbillId) {
+        this.loadRelatedTBill(trade.tbillId);
+      }
     } else {
       // 如果没找到，使用默认数据
       this.setData({
@@ -91,7 +111,48 @@ Page({
     return '其他';
   },
 
+  // 加载关联的T账单信息
+  loadRelatedTBill(tbillId) {
+    wx.cloud.callFunction({
+      name: 'tbillOperations',
+      data: {
+        operation: 'getTBillDetail',
+        data: {
+          tbillId: tbillId
+        }
+      },
+      success: res => {
+        if (res.result.success && res.result.data) {
+          this.setData({
+            relatedTBill: res.result.data
+          });
+        }
+      },
+      fail: err => {
+        console.error('获取关联T账单失败', err);
+      }
+    });
+  },
+
+  // 跳转到T账单详情页面
+  navigateToTBill() {
+    if (this.data.relatedTBill) {
+      wx.navigateTo({
+        url: `/pages/t-bill-detail/t-bill-detail?id=${this.data.relatedTBill._id}`
+      });
+    }
+  },
+
   deleteTrade() {
+    // 检查是否可以删除
+    if (!this.data.isEditable) {
+      wx.showToast({
+        title: '已匹配的交易记录不能删除',
+        icon: 'none'
+      });
+      return;
+    }
+
     const tradeId = this.data.trade._id || this.data.trade.id;
     
     wx.showModal({

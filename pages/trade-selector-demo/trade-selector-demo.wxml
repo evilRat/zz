@@ -1,0 +1,127 @@
+<!--交易选择器演示页面-->
+<view class="container">
+  <view class="demo-section">
+    <view class="section-title">T账单类型选择</view>
+    <picker 
+      class="type-picker" 
+      mode="selector" 
+      range="{{['先买后卖', '先卖后买']}}" 
+      value="{{tType === 'buySell' ? 0 : 1}}"
+      bindchange="onTTypeChange"
+    >
+      <view class="picker-text">
+        {{tType === 'buySell' ? '先买后卖' : '先卖后买'}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="demo-section">
+    <view class="section-title">单个交易记录选择</view>
+    
+    <!-- A交易选择 -->
+    <view class="trade-selection">
+      <view class="selection-header">
+        <text class="selection-title">A交易记录 ({{tType === 'buySell' ? '买入' : '卖出'}})</text>
+        <button class="select-btn" bindtap="selectATradeDemo">选择A交易</button>
+      </view>
+      
+      <view wx:if="{{selectedATrade}}" class="selected-trade">
+        <view class="trade-info">
+          <view class="trade-header">
+            <text class="stock-code">{{selectedATrade.stockCode}}</text>
+            <text class="stock-name">{{selectedATrade.stockName}}</text>
+            <text class="trade-type {{selectedATrade.type}}">
+              {{selectedATrade.type === 'buy' ? '买入' : '卖出'}}
+            </text>
+          </view>
+          <view class="trade-details">
+            <text class="detail">价格: ¥{{formatAmount(selectedATrade.price)}}</text>
+            <text class="detail">数量: {{selectedATrade.quantity}}</text>
+            <text class="detail">金额: ¥{{formatAmount(selectedATrade.amount)}}</text>
+            <text class="detail">日期: {{selectedATrade.date}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view wx:else class="no-selection">
+        <text class="no-selection-text">未选择A交易记录</text>
+      </view>
+    </view>
+
+    <!-- B交易选择 -->
+    <view class="trade-selection">
+      <view class="selection-header">
+        <text class="selection-title">B交易记录 ({{tType === 'buySell' ? '卖出' : '买入'}})</text>
+        <button 
+          class="select-btn {{selectedATrade ? '' : 'disabled'}}" 
+          bindtap="selectBTradeDemo"
+        >
+          选择B交易
+        </button>
+      </view>
+      
+      <view wx:if="{{selectedBTrade}}" class="selected-trade">
+        <view class="trade-info">
+          <view class="trade-header">
+            <text class="stock-code">{{selectedBTrade.stockCode}}</text>
+            <text class="stock-name">{{selectedBTrade.stockName}}</text>
+            <text class="trade-type {{selectedBTrade.type}}">
+              {{selectedBTrade.type === 'buy' ? '买入' : '卖出'}}
+            </text>
+          </view>
+          <view class="trade-details">
+            <text class="detail">价格: ¥{{formatAmount(selectedBTrade.price)}}</text>
+            <text class="detail">数量: {{selectedBTrade.quantity}}</text>
+            <text class="detail">金额: ¥{{formatAmount(selectedBTrade.amount)}}</text>
+            <text class="detail">日期: {{selectedBTrade.date}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view wx:else class="no-selection">
+        <text class="no-selection-text">未选择B交易记录</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="demo-section">
+    <view class="section-title">多个交易记录选择</view>
+    
+    <view class="selection-header">
+      <text class="selection-title">已选择 {{selectedMultipleTrades.length}} 个交易记录</text>
+      <button class="select-btn" bindtap="selectMultipleTradesDemo">选择多个交易</button>
+    </view>
+    
+    <view wx:if="{{selectedMultipleTrades.length > 0}}" class="multiple-trades">
+      <view 
+        wx:for="{{selectedMultipleTrades}}" 
+        wx:key="_id"
+        class="selected-trade"
+      >
+        <view class="trade-info">
+          <view class="trade-header">
+            <text class="stock-code">{{item.stockCode}}</text>
+            <text class="stock-name">{{item.stockName}}</text>
+            <text class="trade-type {{item.type}}">
+              {{item.type === 'buy' ? '买入' : '卖出'}}
+            </text>
+          </view>
+          <view class="trade-details">
+            <text class="detail">价格: ¥{{formatAmount(item.price)}}</text>
+            <text class="detail">数量: {{item.quantity}}</text>
+            <text class="detail">金额: ¥{{formatAmount(item.amount)}}</text>
+            <text class="detail">日期: {{item.date}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view wx:else class="no-selection">
+      <text class="no-selection-text">未选择交易记录</text>
+    </view>
+  </view>
+
+  <view class="demo-section">
+    <button class="clear-btn" bindtap="clearSelections">清空所有选择</button>
+  </view>
+</view>

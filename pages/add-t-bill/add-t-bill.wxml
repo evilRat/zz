@@ -1,4 +1,12 @@
 <view class="container">
+  <!-- 加载状态 -->
+  <view class="loading-mask" wx:if="{{loading}}">
+    <view class="loading-content">
+      <text>加载中...</text>
+    </view>
+  </view>
+
+  <!-- T账单类型选择 -->
   <view class="type-selector">
     <view class="type-item {{tType === 'buySell' ? 'active' : ''}}" bindtap="onTTypeChange" data-type="buySell">
       先买后卖
@@ -8,17 +16,8 @@
     </view>
   </view>
   
+  <!-- 基本信息 -->
   <view class="form-section">
-    <view class="form-group">
-      <view class="form-label">股票代码</view>
-      <input class="form-input" placeholder="请输入股票代码" value="{{stockCode}}" bindinput="onStockCodeInput" />
-    </view>
-    
-    <view class="form-group">
-      <view class="form-label">股票名称</view>
-      <input class="form-input" placeholder="请输入股票名称" value="{{stockName}}" bindinput="onStockNameInput" />
-    </view>
-    
     <view class="form-group">
       <view class="form-label">交易日期</view>
       <picker mode="date" value="{{date}}" start="2010-01-01" end="{{date}}" bindchange="onDateChange">
@@ -29,38 +28,100 @@
     </view>
   </view>
   
-  <!-- 买入信息部分 -->
-  <view class="form-section" wx:if="{{showBuySection}}">
-    <view class="section-title">买入信息</view>
-    
-    <view class="form-group">
-      <view class="form-label">买入价格</view>
-      <input type="digit" class="form-input" placeholder="请输入买入价格" value="{{buyPrice}}" bindinput="onBuyPriceInput" />
+  <!-- A交易记录选择 -->
+  <view class="form-section">
+    <view class="section-title">
+      A交易记录 ({{tType === 'buySell' ? '买入' : '卖出'}})
     </view>
     
-    <view class="form-group">
-      <view class="form-label">买入数量</view>
-      <input type="number" class="form-input" placeholder="请输入买入数量" value="{{buyQuantity}}" bindinput="onBuyQuantityInput" />
+    <view class="trade-selector" wx:if="{{!aTrade}}" bindtap="selectATrade">
+      <view class="selector-placeholder">
+        <text>点击选择{{tType === 'buySell' ? '买入' : '卖出'}}交易记录</text>
+        <text class="selector-arrow">></text>
+      </view>
+    </view>
+    
+    <view class="trade-card" wx:if="{{aTrade}}">
+      <view class="trade-header">
+        <view class="stock-info">
+          <text class="stock-name">{{aTrade.stockName}}</text>
+          <text class="stock-code">{{aTrade.stockCode}}</text>
+        </view>
+        <view class="trade-type {{aTrade.type}}">
+          {{aTrade.type === 'buy' ? '买入' : '卖出'}}
+        </view>
+      </view>
+      
+      <view class="trade-details">
+        <view class="detail-item">
+          <text class="detail-label">价格:</text>
+          <text class="detail-value">¥{{aTrade.price}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">数量:</text>
+          <text class="detail-value">{{aTrade.quantity}}股</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">日期:</text>
+          <text class="detail-value">{{aTrade.date}}</text>
+        </view>
+      </view>
+      
+      <view class="trade-actions">
+        <button class="reselect-btn" size="mini" bindtap="reselectATrade">重新选择</button>
+      </view>
     </view>
   </view>
   
-  <!-- 卖出信息部分 -->
-  <view class="form-section" wx:if="{{showSellSection}}">
-    <view class="section-title">卖出信息</view>
-    
-    <view class="form-group">
-      <view class="form-label">卖出价格</view>
-      <input type="digit" class="form-input" placeholder="请输入卖出价格" value="{{sellPrice}}" bindinput="onSellPriceInput" />
+  <!-- B交易记录选择 -->
+  <view class="form-section" wx:if="{{aTrade}}">
+    <view class="section-title">
+      B交易记录 ({{tType === 'buySell' ? '卖出' : '买入'}})
     </view>
     
-    <view class="form-group">
-      <view class="form-label">卖出数量</view>
-      <input type="number" class="form-input" placeholder="请输入卖出数量" value="{{sellQuantity}}" bindinput="onSellQuantityInput" />
+    <view class="trade-selector" wx:if="{{!bTrade}}" bindtap="selectBTrade">
+      <view class="selector-placeholder">
+        <text>点击选择{{tType === 'buySell' ? '卖出' : '买入'}}交易记录</text>
+        <text class="selector-arrow">></text>
+      </view>
+    </view>
+    
+    <view class="trade-card" wx:if="{{bTrade}}">
+      <view class="trade-header">
+        <view class="stock-info">
+          <text class="stock-name">{{bTrade.stockName}}</text>
+          <text class="stock-code">{{bTrade.stockCode}}</text>
+        </view>
+        <view class="trade-type {{bTrade.type}}">
+          {{bTrade.type === 'buy' ? '买入' : '卖出'}}
+        </view>
+      </view>
+      
+      <view class="trade-details">
+        <view class="detail-item">
+          <text class="detail-label">价格:</text>
+          <text class="detail-value">¥{{bTrade.price}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">数量:</text>
+          <text class="detail-value">{{bTrade.quantity}}股</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">日期:</text>
+          <text class="detail-value">{{bTrade.date}}</text>
+        </view>
+      </view>
+      
+      <view class="trade-actions">
+        <button class="reselect-btn" size="mini" bindtap="reselectBTrade">重新选择</button>
+      </view>
     </view>
   </view>
   
   <!-- 盈亏信息 -->
-  <view class="profit-section" wx:if="{{completed}}">
+  <view class="profit-section" wx:if="{{aTrade && bTrade}}">
+    <view class="section-title">盈亏计算</view>
+    
     <view class="profit-item">
       <view class="profit-label">盈亏金额:</view>
       <view class="profit-value {{profit >= 0 ? 'profit' : 'loss'}}">
@@ -78,15 +139,8 @@
   
   <!-- 操作按钮 -->
   <view class="button-container">
-    <button class="submit-button" type="primary" bindtap="submitBill">
-      {{isEdit ? '保存修改' : '保存账单'}}
-    </button>
-    
-    <!-- 下一步按钮，用于分步骤填写 -->
-    <button class="next-button" type="default" bindtap="onNextStep" 
-            wx:if="{{!completed && ((tType === 'buySell' && showBuySection && !showSellSection && buyPrice && buyQuantity) || 
-                                  (tType === 'sellBuy' && showSellSection && !showBuySection && sellPrice && sellQuantity))}}">
-      下一步
+    <button class="submit-button" type="primary" bindtap="submitBill" disabled="{{loading || !aTrade || !bTrade}}">
+      {{isEdit ? '保存修改' : '创建T账单'}}
     </button>
   </view>
 </view>

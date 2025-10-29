@@ -77,6 +77,25 @@
   margin-bottom: 30rpx;
 }
 
+.match-status-badge {
+  display: inline-block;
+  padding: 10rpx 30rpx;
+  border-radius: 50rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  margin-bottom: 30rpx;
+}
+
+.badge-matched {
+  background-color: rgba(52, 199, 89, 0.15);
+  color: #34c759;
+}
+
+.badge-unmatched {
+  background-color: rgba(255, 149, 0, 0.15);
+  color: #ff9500;
+}
+
 .match-item {
   padding: 20rpx 0;
   border-bottom: 1rpx solid #f0f0f0;
@@ -99,6 +118,7 @@
   justify-content: center;
   gap: 20rpx;
   margin-bottom: 30rpx;
+  flex-wrap: wrap;
 }
 
 .badge-buy {
@@ -195,4 +215,57 @@
 .btn-danger:active {
   transform: scale(0.98);
   box-shadow: 0 2rpx 10rpx rgba(255, 59, 48, 0.2);
+}
+
+.tbill-info {
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 15rpx;
+  border: 2rpx solid #e9ecef;
+  cursor: pointer;
+}
+
+.tbill-info:active {
+  background-color: #e9ecef;
+}
+
+.tbill-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15rpx;
+}
+
+.tbill-row:last-of-type {
+  margin-bottom: 20rpx;
+}
+
+.tbill-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.tbill-value {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.tbill-link {
+  text-align: center;
+  font-size: 26rpx;
+  color: #007aff;
+  font-weight: 500;
+}
+
+.disabled-notice {
+  background-color: #f8f9fa;
+  border: 2rpx solid #e9ecef;
+  border-radius: 15rpx;
+  padding: 30rpx;
+  text-align: center;
+}
+
+.notice-text {
+  font-size: 28rpx;
+  color: #666;
 }

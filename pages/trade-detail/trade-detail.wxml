@@ -12,6 +12,9 @@
       <view class="market-type-badge">
         {{marketType}}
       </view>
+      <view class="match-status-badge badge-{{trade.matchStatus || 'unmatched'}}">
+        {{trade.matchStatus === 'matched' ? '已匹配' : '未匹配'}}
+      </view>
     </view>
     <view class="trade-amount">¥{{trade.amount}}</view>
     <view wx:if="{{trade.profit !== undefined}}" class="trade-profit {{trade.profit >= 0 ? 'profit-positive' : 'profit-negative'}}">
@@ -44,9 +47,29 @@
         </view>
         
         <view class="detail-item">
-          <text class="detail-label">剩余未匹配</text>
-          <text class="detail-value">{{trade.remainingQuantity || trade.quantity}}</text>
+          <text class="detail-label">匹配状态</text>
+          <text class="detail-value">{{trade.matchStatus === 'matched' ? '已匹配' : '未匹配'}}</text>
         </view>
+      </view>
+    </view>
+    
+    <!-- 关联T账单信息 -->
+    <view wx:if="{{trade.matchStatus === 'matched' && relatedTBill}}" class="detail-card">
+      <view class="card-title">关联T账单</view>
+      <view class="tbill-info" bindtap="navigateToTBill">
+        <view class="tbill-row">
+          <text class="tbill-label">T账单类型:</text>
+          <text class="tbill-value">{{relatedTBill.tType === 'buySell' ? '先买后卖' : '先卖后买'}}</text>
+        </view>
+        <view class="tbill-row">
+          <text class="tbill-label">盈利金额:</text>
+          <text class="tbill-value {{relatedTBill.profit >= 0 ? 'profit-positive' : 'profit-negative'}}">¥{{relatedTBill.profit}}</text>
+        </view>
+        <view class="tbill-row">
+          <text class="tbill-label">盈利率:</text>
+          <text class="tbill-value {{relatedTBill.profitRate >= 0 ? 'profit-positive' : 'profit-negative'}}">{{relatedTBill.profitRate}}%</text>
+        </view>
+        <view class="tbill-link">点击查看T账单详情 ></view>
       </view>
     </view>
     
@@ -83,6 +106,9 @@
   </view>
   
   <view class="actions">
-    <button class="btn-danger" bindtap="deleteTrade">删除记录</button>
+    <button wx:if="{{isEditable}}" class="btn-danger" bindtap="deleteTrade">删除记录</button>
+    <view wx:else class="disabled-notice">
+      <text class="notice-text">已匹配的交易记录不可编辑或删除</text>
+    </view>
   </view>
 </view>

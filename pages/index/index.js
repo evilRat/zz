@@ -4,12 +4,18 @@ const { updateAllTradesMatching } = require('../../utils/calculations.js');
 Page({
   data: {
     currentStock: 'all',
+    currentMatchStatus: 'all', // 新增：当前匹配状态筛选
     stocks: [
       { id: 1, code: '000001', name: '平安银行' },
       { id: 2, code: '600036', name: '招商银行' },
       { id: 3, code: '510310', name: '沪深300ETF' }
     ],
-    trades: []
+    trades: [],
+    matchStatusOptions: [ // 新增：匹配状态选项
+      { value: 'all', label: '全部' },
+      { value: 'unmatched', label: '未匹配' },
+      { value: 'matched', label: '已匹配' }
+    ]
   },
 
   onLoad() {
@@ -33,20 +39,18 @@ Page({
         if (res.result.success) {
           let trades = res.result.data || [];
           
-          // 重新计算所有交易的匹配状态以确保数据一致性
-          if (trades.length > 0) {
-            trades = updateAllTradesMatching(trades);
-          }
-          
-          // 为每个交易添加市场类型标识
+          // 为每个交易添加市场类型标识和默认matchStatus
           const tradesWithMarket = trades.map(trade => {
             return {
               ...trade,
-              market: this.getMarketType(trade.stockCode)
+              market: this.getMarketType(trade.stockCode),
+              matchStatus: trade.matchStatus || 'unmatched' // 确保有matchStatus字段
             };
           });
           
-          this.setData({ trades: tradesWithMarket });
+          // 应用筛选条件
+          const filteredTrades = this.applyFilters(tradesWithMarket);
+          this.setData({ trades: filteredTrades });
           
           // 更新股票列表，包含用户添加的所有股票
           this.updateStockList(tradesWithMarket);
@@ -68,20 +72,18 @@ Page({
     // 从本地存储加载数据（作为备选方案）
     let trades = wx.getStorageSync('trades') || [];
     
-    // 重新计算所有交易的匹配状态以确保数据一致性
-    if (trades.length > 0) {
-      trades = updateAllTradesMatching(trades);
-    }
-    
-    // 为每个交易添加市场类型标识
+    // 为每个交易添加市场类型标识和默认matchStatus
     const tradesWithMarket = trades.map(trade => {
       return {
         ...trade,
-        market: this.getMarketType(trade.stockCode)
+        market: this.getMarketType(trade.stockCode),
+        matchStatus: trade.matchStatus || 'unmatched' // 确保有matchStatus字段
       };
     });
     
-    this.setData({ trades: tradesWithMarket });
+    // 应用筛选条件
+    const filteredTrades = this.applyFilters(tradesWithMarket);
+    this.setData({ trades: filteredTrades });
     
     // 更新股票列表，包含用户添加的所有股票
     this.updateStockList(tradesWithMarket);
@@ -133,67 +135,84 @@ Page({
   selectStock(e) {
     const stockCode = e.currentTarget.dataset.stock;
     this.setData({ currentStock: stockCode });
-    
-    // 如果选择的是"全部"，显示所有交易，否则只显示选中股票的交易
-    if (stockCode === 'all') {
-      this.loadTrades();
-    } else {
-      // 从云端加载数据
-      wx.cloud.callFunction({
-        name: 'tradeOperations',
-        data: {
-          operation: 'getAllTrades'
-        },
-        success: res => {
-          if (res.result.success) {
-            let allTrades = res.result.data || [];
-            
-            // 重新计算所有交易的匹配状态以确保数据一致性
-            if (allTrades.length > 0) {
-              allTrades = updateAllTradesMatching(allTrades);
-            }
-            
-            const tradesWithMarket = allTrades.map(trade => {
-              return {
-                ...trade,
-                market: this.getMarketType(trade.stockCode)
-              };
-            });
-            const filteredTrades = tradesWithMarket.filter(trade => trade.stockCode === stockCode);
-            this.setData({ trades: filteredTrades });
-          } else {
-            console.error('获取交易记录失败', res.result.message);
-            // 如果云端获取失败，尝试从本地存储加载
-            this.selectStockFromLocalStorage(stockCode);
-          }
-        },
-        fail: err => {
-          console.error('调用云函数失败', err);
-          // 如果云端获取失败，尝试从本地存储加载
-          this.selectStockFromLocalStorage(stockCode);
-        }
-      });
-    }
+    this.refreshTradeList();
   },
-  
-  selectStockFromLocalStorage(stockCode) {
-    // 从本地存储加载数据（作为备选方案）
+
+  // 新增：选择匹配状态筛选
+  selectMatchStatus(e) {
+    const matchStatus = e.currentTarget.dataset.status;
+    this.setData({ currentMatchStatus: matchStatus });
+    this.refreshTradeList();
+  },
+
+  // 新增：刷新交易列表（应用所有筛选条件）
+  refreshTradeList() {
+    wx.cloud.callFunction({
+      name: 'tradeOperations',
+      data: {
+        operation: 'getAllTrades'
+      },
+      success: res => {
+        if (res.result.success) {
+          let allTrades = res.result.data || [];
+          
+          const tradesWithMarket = allTrades.map(trade => {
+            return {
+              ...trade,
+              market: this.getMarketType(trade.stockCode),
+              matchStatus: trade.matchStatus || 'unmatched'
+            };
+          });
+          
+          // 应用筛选条件
+          const filteredTrades = this.applyFilters(tradesWithMarket);
+          this.setData({ trades: filteredTrades });
+        } else {
+          console.error('获取交易记录失败', res.result.message);
+          this.refreshTradeListFromLocalStorage();
+        }
+      },
+      fail: err => {
+        console.error('调用云函数失败', err);
+        this.refreshTradeListFromLocalStorage();
+      }
+    });
+  },
+
+  // 新增：从本地存储刷新交易列表
+  refreshTradeListFromLocalStorage() {
     let allTrades = wx.getStorageSync('trades') || [];
-    
-    // 重新计算所有交易的匹配状态以确保数据一致性
-    if (allTrades.length > 0) {
-      allTrades = updateAllTradesMatching(allTrades);
-    }
     
     const tradesWithMarket = allTrades.map(trade => {
       return {
         ...trade,
-        market: this.getMarketType(trade.stockCode)
+        market: this.getMarketType(trade.stockCode),
+        matchStatus: trade.matchStatus || 'unmatched'
       };
     });
-    const filteredTrades = tradesWithMarket.filter(trade => trade.stockCode === stockCode);
+    
+    // 应用筛选条件
+    const filteredTrades = this.applyFilters(tradesWithMarket);
     this.setData({ trades: filteredTrades });
   },
+
+  // 新增：应用筛选条件
+  applyFilters(trades) {
+    let filteredTrades = trades;
+    
+    // 按股票代码筛选
+    if (this.data.currentStock !== 'all') {
+      filteredTrades = filteredTrades.filter(trade => trade.stockCode === this.data.currentStock);
+    }
+    
+    // 按匹配状态筛选
+    if (this.data.currentMatchStatus !== 'all') {
+      filteredTrades = filteredTrades.filter(trade => trade.matchStatus === this.data.currentMatchStatus);
+    }
+    
+    return filteredTrades;
+  },
+
 
   goToDetail(e) {
     const id = e.currentTarget.dataset.id;

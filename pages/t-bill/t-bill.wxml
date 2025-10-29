@@ -26,44 +26,77 @@
         
         <view class="bill-content">
           <view class="trade-info">
-            <view class="trade-row">
-              <view class="trade-label">买入:</view>
-              <view class="trade-value">
-                <text class="price">¥{{item.buyPrice || '-'}}</text>
-                <text class="quantity">{{item.buyQuantity || '-'}}股</text>
+            <!-- A交易记录信息 -->
+            <view class="trade-section">
+              <view class="trade-section-title">A交易 ({{item.tType === 'buySell' ? '买入' : '卖出'}})</view>
+              <view class="trade-details" wx:if="{{item.aTrade}}">
+                <view class="trade-detail-item">
+                  <text class="detail-label">价格:</text>
+                  <text class="detail-value">¥{{formatAmount(item.aTrade.price)}}</text>
+                </view>
+                <view class="trade-detail-item">
+                  <text class="detail-label">数量:</text>
+                  <text class="detail-value">{{item.aTrade.quantity}}股</text>
+                </view>
+                <view class="trade-detail-item">
+                  <text class="detail-label">日期:</text>
+                  <text class="detail-value">{{formatDate(item.aTrade.date)}}</text>
+                </view>
               </view>
             </view>
-            <view class="trade-row">
-              <view class="trade-label">卖出:</view>
-              <view class="trade-value">
-                <text class="price">¥{{item.sellPrice || '-'}}</text>
-                <text class="quantity">{{item.sellQuantity || '-'}}股</text>
+            
+            <!-- B交易记录信息 -->
+            <view class="trade-section">
+              <view class="trade-section-title">B交易 ({{item.tType === 'buySell' ? '卖出' : '买入'}})</view>
+              <view class="trade-details" wx:if="{{item.bTrade}}">
+                <view class="trade-detail-item">
+                  <text class="detail-label">价格:</text>
+                  <text class="detail-value">¥{{formatAmount(item.bTrade.price)}}</text>
+                </view>
+                <view class="trade-detail-item">
+                  <text class="detail-label">数量:</text>
+                  <text class="detail-value">{{item.bTrade.quantity}}股</text>
+                </view>
+                <view class="trade-detail-item">
+                  <text class="detail-label">日期:</text>
+                  <text class="detail-value">{{formatDate(item.bTrade.date)}}</text>
+                </view>
               </view>
             </view>
           </view>
           
           <view class="status-info">
-            <view class="date">{{item.date || '-'}}</view>
-            <view class="status {{item.completed ? 'completed' : 'incomplete'}}">
-              {{item.completed ? '已完成' : '未完成'}}
-            </view>
+            <view class="date">T账单日期: {{item.date || '-'}}</view>
+            <view class="quantity-info">数量: {{item.quantity}}股</view>
           </view>
         </view>
         
-        <view class="profit-info" wx:if="{{item.completed && item.profit !== undefined}}">
-          <text class="profit-label">盈亏:</text>
-          <text class="profit-value {{item.profit >= 0 ? 'profit' : 'loss'}}">
-            {{item.profit >= 0 ? '+' : ''}}¥{{item.profit}}
-          </text>
-          <text class="profit-rate {{item.profit >= 0 ? 'profit' : 'loss'}}">
-            ({{item.profitRate >= 0 ? '+' : ''}}{{item.profitRate}}%)
-          </text>
+        <!-- 优化的盈亏信息显示 -->
+        <view class="profit-info" wx:if="{{item.profit !== undefined}}">
+          <view class="profit-main">
+            <text class="profit-label">盈亏:</text>
+            <text class="profit-value {{item.profit >= 0 ? 'profit' : 'loss'}}">
+              {{item.profit >= 0 ? '+' : ''}}¥{{formatAmount(item.profit)}}
+            </text>
+            <text class="profit-rate {{item.profit >= 0 ? 'profit' : 'loss'}}">
+              ({{item.profitRate >= 0 ? '+' : ''}}{{formatAmount(item.profitRate)}}%)
+            </text>
+          </view>
+          
+          <!-- 盈亏详情 -->
+          <view class="profit-details" wx:if="{{item.aTrade && item.bTrade}}">
+            <text class="profit-calculation">
+              {{item.tType === 'buySell' ? '卖出价-买入价' : '卖出价-买入价'}} = 
+              ¥{{formatAmount(item.bTrade.price)}} - ¥{{formatAmount(item.aTrade.price)}} = 
+              ¥{{formatAmount(item.tType === 'buySell' ? item.bTrade.price - item.aTrade.price : item.aTrade.price - item.bTrade.price)}}
+            </text>
+          </view>
         </view>
       </view>
     </block>
     
     <view class="empty-tip" wx:if="{{getFilteredTBills().length === 0}}">
-      <text>暂无T账单记录</text>
+      <text>{{statusFilter === 'incomplete' ? '暂无未完成的T账单' : '暂无T账单记录'}}</text>
     </view>
   </view>
   

@@ -5,7 +5,9 @@
     "pages/add-trade/add-trade",
     "pages/me/me",
     "pages/t-bill/t-bill",
-    "pages/add-t-bill/add-t-bill"
+    "pages/add-t-bill/add-t-bill",
+    "pages/trade-selector/trade-selector",
+    "pages/trade-selector-demo/trade-selector-demo"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -14,9 +14,9 @@ Page({
   },
 
   loadTBills() {
-    // 从云端加载T账单数据
+    // 从云端加载T账单数据，使用新的tbillOperations云函数
     wx.cloud.callFunction({
-      name: 'tradeOperations',
+      name: 'tbillOperations',
       data: {
         operation: 'getAllTBills'
       },
@@ -26,22 +26,20 @@ Page({
           this.setData({ tbills });
         } else {
           console.error('获取T账单记录失败', res.result.message);
-          // 如果云端获取失败，尝试从本地存储加载
-          this.loadTBillsFromLocalStorage();
+          wx.showToast({
+            title: '加载失败',
+            icon: 'none'
+          });
         }
       },
       fail: err => {
         console.error('调用云函数失败', err);
-        // 如果云端获取失败，尝试从本地存储加载
-        this.loadTBillsFromLocalStorage();
+        wx.showToast({
+          title: '加载失败',
+          icon: 'none'
+        });
       }
     });
-  },
-  
-  loadTBillsFromLocalStorage() {
-    // 从本地存储加载T账单数据（作为备选方案）
-    let tbills = wx.getStorageSync('tbills') || [];
-    this.setData({ tbills });
   },
 
   filterByStatus(e) {
@@ -52,12 +50,14 @@ Page({
   getFilteredTBills() {
     const { tbills, statusFilter } = this.data;
     
+    // 新的T账单都是完成状态，所以简化筛选逻辑
     if (statusFilter === 'all') {
       return tbills;
-    } else if (statusFilter === 'incomplete') {
-      return tbills.filter(bill => !bill.completed);
     } else if (statusFilter === 'completed') {
-      return tbills.filter(bill => bill.completed);
+      return tbills;
+    } else if (statusFilter === 'incomplete') {
+      // 新系统中所有T账单都是完成状态
+      return [];
     }
     
     return tbills;
@@ -92,5 +92,20 @@ Page({
     }
     // 默认
     return '其他';
+  },
+
+  // 格式化日期显示
+  formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}-${day}`;
+  },
+
+  // 格式化金额显示
+  formatAmount(amount) {
+    if (amount === undefined || amount === null) return '-';
+    return parseFloat(amount).toFixed(2);
   }
 });
