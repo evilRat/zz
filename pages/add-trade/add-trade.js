@@ -11,6 +11,12 @@ Page({
     date: '',
     amount: 0
   },
+  
+  // 生成唯一ID的方法，避免多用户并发时的时间戳冲突
+  generateUniqueId() {
+    // 结合时间戳和随机数生成唯一ID
+    return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+  },
 
   onLoad() {
     // 设置默认日期为今天
@@ -118,7 +124,7 @@ Page({
 
     // 创建交易记录对象
     const newTrade = {
-      id: Date.now(), // 使用时间戳作为唯一ID
+      id: this.generateUniqueId(), // 使用更安全的唯一ID生成方法
       stockCode: this.data.stockCode,
       stockName: this.data.stockName,
       type: this.data.tradeType,

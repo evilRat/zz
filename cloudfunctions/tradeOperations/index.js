@@ -43,7 +43,7 @@ exports.main = async (event, context) => {
       case 'deleteTrade':
         // 删除交易记录
         const deleteResult = await db.collection('trades').where({
-          _id: data.tradeId,
+          id: data.tradeId,
           _openid: wxContext.OPENID
         }).remove()
         
@@ -55,7 +55,7 @@ exports.main = async (event, context) => {
       case 'getTradeById':
         // 根据ID获取交易记录
         const getResult = await db.collection('trades').where({
-          _id: data.tradeId,
+          id: data.tradeId,
           _openid: wxContext.OPENID
         }).get()
         

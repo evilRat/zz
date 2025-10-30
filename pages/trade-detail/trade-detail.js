@@ -16,7 +16,7 @@ Page({
       data: {
         operation: 'getTradeById',
         data: {
-          id: id
+          tradeId: id
         }
       },
       success: res => {
@@ -92,7 +92,7 @@ Page({
   },
 
   deleteTrade() {
-    const tradeId = this.data.trade._id || this.data.trade.id;
+    const tradeId = this.data.trade.id;
     
     wx.showModal({
       title: '确认删除',
