@@ -9,7 +9,8 @@ Page({
       { id: 2, code: '600036', name: '招商银行' },
       { id: 3, code: '510310', name: '沪深300ETF' }
     ],
-    trades: []
+    trades: [],
+    isLoading: true // 添加加载状态
   },
 
   onLoad() {
@@ -22,7 +23,24 @@ Page({
     this.loadTrades();
   },
 
-  loadTrades() {
+  // 下拉刷新事件处理函数
+  onPullDownRefresh() {
+    // 显示导航栏加载动画
+    wx.showNavigationBarLoading();
+    
+    // 重新加载交易数据
+    this.loadTrades(() => {
+      // 数据加载完成后停止下拉刷新
+      wx.stopPullDownRefresh();
+      // 隐藏导航栏加载动画
+      wx.hideNavigationBarLoading();
+    });
+  },
+
+  loadTrades(callback) {
+    // 设置加载状态为true
+    this.setData({ isLoading: true });
+    
     // 从云端加载数据
     wx.cloud.callFunction({
       name: 'tradeOperations',
@@ -46,7 +64,10 @@ Page({
             };
           });
           
-          this.setData({ trades: tradesWithMarket });
+          this.setData({ 
+            trades: tradesWithMarket,
+            isLoading: false // 加载完成，设置为false
+          });
           
           // 更新股票列表，包含用户添加的所有股票
           this.updateStockList(tradesWithMarket);
@@ -55,11 +76,21 @@ Page({
           // 如果云端获取失败，尝试从本地存储加载
           this.loadTradesFromLocalStorage();
         }
+        
+        // 执行回调函数（如果提供）
+        if (typeof callback === 'function') {
+          callback();
+        }
       },
       fail: err => {
         console.error('调用云函数失败', err);
         // 如果云端获取失败，尝试从本地存储加载
         this.loadTradesFromLocalStorage();
+        
+        // 执行回调函数（如果提供）
+        if (typeof callback === 'function') {
+          callback();
+        }
       }
     });
   },
@@ -81,7 +112,10 @@ Page({
       };
     });
     
-    this.setData({ trades: tradesWithMarket });
+    this.setData({ 
+      trades: tradesWithMarket,
+      isLoading: false // 加载完成，设置为false
+    });
     
     // 更新股票列表，包含用户添加的所有股票
     this.updateStockList(tradesWithMarket);
@@ -138,6 +172,9 @@ Page({
     if (stockCode === 'all') {
       this.loadTrades();
     } else {
+      // 设置加载状态为true
+      this.setData({ isLoading: true });
+      
       // 从云端加载数据
       wx.cloud.callFunction({
         name: 'tradeOperations',
@@ -160,7 +197,10 @@ Page({
               };
             });
             const filteredTrades = tradesWithMarket.filter(trade => trade.stockCode === stockCode);
-            this.setData({ trades: filteredTrades });
+            this.setData({ 
+              trades: filteredTrades,
+              isLoading: false // 加载完成，设置为false
+            });
           } else {
             console.error('获取交易记录失败', res.result.message);
             // 如果云端获取失败，尝试从本地存储加载
@@ -192,7 +232,10 @@ Page({
       };
     });
     const filteredTrades = tradesWithMarket.filter(trade => trade.stockCode === stockCode);
-    this.setData({ trades: filteredTrades });
+    this.setData({ 
+      trades: filteredTrades,
+      isLoading: false // 加载完成，设置为false
+    });
   },
 
   goToDetail(e) {

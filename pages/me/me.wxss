@@ -36,7 +36,8 @@
 .detail-item {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
+  align-items: center;
+  padding: 15px 0;
   border-bottom: 1px solid #eee;
 }
 
@@ -48,6 +49,28 @@
   font-weight: bold;
   color: #666;
   margin-right: 10px;
+  flex: 0 0 60px;
+}
+
+.editable-input {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 16px;
+}
+
+.gender-picker {
+  flex: 1;
+}
+
+.picker-display {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  text-align: left;
+  background-color: #fff;
+  font-size: 16px;
 }
 
 .no-user-info {
@@ -68,4 +91,15 @@
   padding: 12px 30px;
   border-radius: 25px;
   font-size: 16px;
+}
+
+.save-btn {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  margin-top: 30px;
+  width: 100%;
 }

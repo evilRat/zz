@@ -1,7 +1,15 @@
 Page({
   data: {
     userInfo: {},
-    hasUserInfo: false
+    hasUserInfo: false,
+    // 性别选项
+    genders: [
+      { id: 0, name: '不告诉你' },
+      { id: 1, name: '男' },
+      { id: 2, name: '女' }
+    ],
+    selectedGenderIndex: 0,
+    editedCity: ''
   },
 
   onLoad() {
@@ -15,9 +23,15 @@ Page({
       name: 'getUserInfo',
       success: res => {
         if (res.result.success && res.result.data) {
+          const userInfo = res.result.data.userInfo;
+          // 根据用户信息设置性别索引
+          const genderIndex = this.data.genders.findIndex(gender => gender.id === (userInfo.gender || 0));
+          
           this.setData({
-            userInfo: res.result.data.userInfo,
-            hasUserInfo: true
+            userInfo: userInfo,
+            hasUserInfo: true,
+            selectedGenderIndex: genderIndex >= 0 ? genderIndex : 0,
+            editedCity: userInfo.city || ''
           });
         }
       },
@@ -32,17 +46,60 @@ Page({
     wx.getUserProfile({
       desc: '用于完善用户资料',
       success: (res) => {
+        const userInfo = res.userInfo;
+        // 根据用户信息设置性别索引
+        const genderIndex = this.data.genders.findIndex(gender => gender.id === (userInfo.gender || 0));
+        
         this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
+          userInfo: userInfo,
+          hasUserInfo: true,
+          selectedGenderIndex: genderIndex >= 0 ? genderIndex : 0,
+          editedCity: userInfo.city || ''
         });
         
         // 将用户信息存储到云端
-        this.saveUserInfoToCloud(res.userInfo);
+        this.saveUserInfoToCloud(userInfo);
       },
       fail: (err) => {
         console.log('获取用户信息失败', err);
       }
+    });
+  },
+
+  // 城市输入事件处理
+  onCityInput(e) {
+    this.setData({
+      editedCity: e.detail.value
+    });
+  },
+
+  // 性别选择事件处理
+  onGenderChange(e) {
+    this.setData({
+      selectedGenderIndex: e.detail.value
+    });
+  },
+
+  // 保存用户信息
+  saveUserInfo() {
+    // 创建更新后的用户信息对象
+    const updatedUserInfo = {
+      ...this.data.userInfo,
+      city: this.data.editedCity,
+      gender: this.data.genders[this.data.selectedGenderIndex].id
+    };
+
+    this.setData({
+      userInfo: updatedUserInfo
+    });
+
+    // 将更新后的用户信息存储到云端
+    this.saveUserInfoToCloud(updatedUserInfo);
+    
+    // 显示保存成功的提示
+    wx.showToast({
+      title: '保存成功',
+      icon: 'success'
     });
   },
 
@@ -69,9 +126,15 @@ Page({
   onGetUserInfo(e) {
     // 用户点击获取用户信息按钮时触发
     if (e.detail.userInfo) {
+      const userInfo = e.detail.userInfo;
+      // 根据用户信息设置性别索引
+      const genderIndex = this.data.genders.findIndex(gender => gender.id === (userInfo.gender || 0));
+      
       this.setData({
-        userInfo: e.detail.userInfo,
-        hasUserInfo: true
+        userInfo: userInfo,
+        hasUserInfo: true,
+        selectedGenderIndex: genderIndex >= 0 ? genderIndex : 0,
+        editedCity: userInfo.city || ''
       });
       
       // 将用户信息存储到云端

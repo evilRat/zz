@@ -14,13 +14,21 @@
       <text>详情</text>
     </view>
     
-    <view wx:if="{{trades.length === 0}}" class="empty-state">
+    <!-- 加载指示器 -->
+    <view wx:if="{{isLoading}}" class="loading-container">
+      <view class="loading-spinner"></view>
+      <view class="loading-text">加载中...</view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view wx:if="{{trades.length === 0 && !isLoading}}" class="empty-state">
       <view class="empty-icon">📊</view>
       <view>暂无交易记录</view>
       <view class="empty-hint">点击右下角按钮添加第一条记录</view>
     </view>
     
-    <view wx:for="{{trades}}" wx:key="id" class="trade-item {{item.type}}" data-id="{{item.id}}" bindtap="goToDetail">
+    <!-- 交易记录列表 -->
+    <view wx:if="{{!isLoading}}" wx:for="{{trades}}" wx:key="id" class="trade-item {{item.type}}" data-id="{{item.id}}" bindtap="goToDetail">
       <view class="trade-row">
         <view>
           <text class="stock-info">{{item.stockName}}</text>

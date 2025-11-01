@@ -3,22 +3,29 @@
     <block wx:if="{{hasUserInfo}}">
       <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
       <text class="nickname">{{userInfo.nickName}}</text>
+      
       <view class="user-details">
+        <!-- 城市编辑 -->
         <view class="detail-item">
           <text class="label">城市:</text>
-          <text>{{userInfo.city}}, {{userInfo.province}}</text>
+          <input class="editable-input" value="{{userInfo.city}}" bindinput="onCityInput" placeholder="请输入城市"/>
         </view>
+        
+        <!-- 性别编辑 -->
         <view class="detail-item">
           <text class="label">性别:</text>
-          <text wx:if="{{userInfo.gender === 1}}">男</text>
-          <text wx:if="{{userInfo.gender === 2}}">女</text>
-          <text wx:if="{{userInfo.gender === 0}}">未知</text>
+          <picker class="gender-picker" mode="selector" range="{{genders}}" range-key="name" value="{{selectedGenderIndex}}" bindchange="onGenderChange">
+            <view class="picker-display">
+              {{genders[selectedGenderIndex].name}}
+            </view>
+          </picker>
         </view>
-        <view class="detail-item">
-          <text class="label">语言:</text>
-          <text>{{userInfo.language}}</text>
-        </view>
+        
+        <!-- 语言字段已移除 -->
       </view>
+      
+      <!-- 保存按钮 -->
+      <button class="save-btn" bindtap="saveUserInfo">保存信息</button>
     </block>
     
     <block wx:else>

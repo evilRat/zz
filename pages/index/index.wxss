@@ -226,3 +226,32 @@
   margin-top: 20rpx;
   font-size: 24rpx;
 }
+
+/* 加载指示器样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.loading-spinner {
+  width: 100rpx;
+  height: 100rpx;
+  border: 8rpx solid #f3f3f3;
+  border-top: 8rpx solid #007aff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 30rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666;
+}
