@@ -4,11 +4,7 @@ const { updateAllTradesMatching } = require('../../utils/calculations.js');
 Page({
   data: {
     currentStock: 'all',
-    stocks: [
-      { id: 1, code: '000001', name: '平安银行' },
-      { id: 2, code: '600036', name: '招商银行' },
-      { id: 3, code: '510310', name: '沪深300ETF' }
-    ],
+    stocks: [],
     trades: [],
     isLoading: true // 添加加载状态
   },

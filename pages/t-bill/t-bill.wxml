@@ -1,0 +1,40 @@
+<view class="container">
+  <view class="t-bill-list">
+    <view class="list-header">
+      <text>T账单列表</text>
+    </view>
+    
+    <view wx:if="{{tbills.length === 0}}" class="empty-state">
+      <view class="empty-icon">📋</view>
+      <view>暂无T账单记录</view>
+      <view class="empty-hint">点击右下角按钮创建第一条T账单</view>
+    </view>
+    
+    <view wx:for="{{tbills}}" wx:key="id" class="t-bill-item" data-id="{{item._id}}" bindtap="goToTBillDetail">
+      <view class="t-bill-row">
+        <view>
+          <text class="stock-info">{{item.stockName}}({{item.stockCode}})</text>
+          <view class="t-bill-info-row">
+            <text class="t-bill-type {{item.type}}">{{item.type === 'buy-sell' ? '先买后卖' : '先卖后买'}}</text>
+            <text class="status-badge {{item.status}}">{{item.status === 'completed' ? '已完成' : '进行中'}}</text>
+          </view>
+        </view>
+        <view class="quantity-container">
+          <text class="quantity">{{item.quantity}}</text>
+        </view>
+      </view>
+      
+      <view class="t-bill-details">
+        <view class="detail-item">
+          <text class="detail-label">收益:</text>
+          <text class="detail-value {{item.profit >= 0 ? 'profit-positive' : 'profit-negative'}}">
+            ¥{{item.profit || 0}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-button" bindtap="goToCreateTBill"></view>
+</view>

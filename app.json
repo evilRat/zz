@@ -3,7 +3,9 @@
     "pages/index/index",
     "pages/trade-detail/trade-detail",
     "pages/add-trade/add-trade",
-    "pages/me/me"
+    "pages/me/me",
+    "pages/t-bill/t-bill",
+    "pages/add-t-bill/add-t-bill"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -22,6 +24,12 @@
         "iconPath": "images/record.png",
         "selectedIconPath": "images/record.png",
         "text": "交易记录"
+      },
+      {
+        "pagePath": "pages/t-bill/t-bill",
+        "iconPath": "images/tbill.png",
+        "selectedIconPath": "images/tbill.png",
+        "text": "T账单"
       },
       {
         "pagePath": "pages/me/me",
